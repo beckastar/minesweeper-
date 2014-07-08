@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+	</head>
+	<style>
+	.grid{
+
+	}
+	#unclicked {
+	width: 100px;
+	height: 100px;
+	background: gray;
+	}
+	#clicked{
+	width: 100px;
+	height: 100px;
+	background: white;
+	}
+	</style>
+	<script src="jquery/jquery-1.11.1.min.js"></script> 
+	<script type="text/javascript">
+
+
+
+
+
+	var n = 8
+	//this is the problem
+	var gen_rows = function(x){ 
+		var row = []
+		for (i=0; i<x; i++){
+			var o = {}
+			o.is_visible = "false";
+			o.category = "empty"; 
+			o.number = 0;
+			row.push(o)
+		} 
+		return row
+	}
+	console.log(gen_rows(8))
+	//create array for board
+	//works 
+	var init_board = function(x){
+		var container = [];
+		// var row = gen_rows()
+		for (var i=0; i<x; i++){
+			container.push(gen_rows(n))  
+		}
+		return container
+			} 
+//board is created
+	var seed_bomb= function(x){
+		var seed_bomb_index = Math.floor(Math.random() * 7)
+		return seed_bomb_index
+	}
+	var gen_bomb_coordinates=function(){ 
+	 		var x = seed_bomb(n);
+	 		var y = seed_bomb(n); 
+			return [x, y]
+	}
+	console.log(gen_bomb_coordinates())
+	var get_bomb_coordinates = function(){
+		var bomb_coordinates = [];
+		var num_bombs = 3
+		for(var i=0; i<num_bombs; i++){
+			bomb_coordinates.push(gen_bomb_coordinates())
+		}  
+		return bomb_coordinates
+	}
+	var add_bombs= function(){
+		var board = init_board(n);
+		//console.log(board)
+		var bomb_coordinates = get_bomb_coordinates()		
+		//console.log(num_bombs)
+		//console.log(bomb_coordinates)
+		var l = bomb_coordinates.length; 
+		for (i=0; i<l; i++){
+			var current = bomb_coordinates.pop() 
+			console.log("current array="+current)
+			var x = current[0];
+			console.log("x="+x)
+			var y = current[1]
+			console.log("y="+y)
+			var index = board[x]
+			//console.log(index)
+			//console.log(index[y])
+			var d = index[y]
+			//console.log(d)
+			d["category"] = "bomb"
+			//console.log(d)
+		}
+		return board
+	} 
+
+	var gen_numbers = function(){
+		var board = add_bombs() 
+		var bomb_coordinates = get_bomb_coordinates() 
+		var l = bomb_coordinates.length 
+		for (i=0; i<l; i++){
+			var current = bomb_coordinates.pop()
+			var x = current[0]	
+			var y = current[1]
+			console.log("x="+ x)
+			console.log("y="+y)
+				if(x > 0 && y<n){
+					board[x-1][y+1]["number"]++
+				}
+				if (x>0 && y>0){
+					board[x-1][y-1]["number"]++
+				}
+				if (y>0 && x<n){
+					board[x+1][y-1]["number"]++
+				}
+				if (x<n && y<n){
+					board[x+1][y+1]["number"]++
+				}
+				if (x<n){
+					board[x+1][y]["number"]++
+				}
+				if (y<n){
+					board[x][y+1]["number"]++
+				}
+				if (y>0){
+					board[x][y-1]["number"]++
+				}
+				if (x>0){
+					board[x-1][y]["number"]++	
+				} 
+			}
+		return board
+		}
+		$(document).ready(function(){  
+				for (i=0; i<n; i++){
+					$(".grid").append("<tr class='gridrow'></tr>")
+				} 
+				for (i=0;i<n;i++){
+					$(".gridrow").append("<td id='unclicked'></td>")
+				}
+				$("#unclicked").click(function() {
+   				 $(this).css('background', 'yellow');
+   				});
+		});
+	
+console.log(gen_numbers())
+	</script>
+	<body>
+	<div id="board">
+                <table class="grid">
+                </table>
+            </div>
+	</div>
+	</body>

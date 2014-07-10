@@ -28,8 +28,15 @@
 
 	$(document).ready(function(){  
 
+
 		var n = 8
-		//this is the problem
+		//create grid 
+		for (i=0; i<n; i++){
+			$(".grid").append("<tr class='gridrow'></tr>")
+		} 
+		for (i=0;i<n;i++){
+				$(".gridrow").append("<td id='unclicked'></td>")
+		} 
 		var gen_rows = function(x){ 
 			var row = []
 			for (i=0; i<x; i++){
@@ -40,8 +47,7 @@
 				row.push(o)
 			} 
 			return row
-		}
-		console.log(gen_rows(8))
+		} 
 		//create array for board
 		//works 
 		var init_board = function(x){
@@ -71,114 +77,123 @@
 			}  
 			return bomb_coordinates
 		}
-		var add_bombs= function(){
-			var board = init_board(n);
-			//console.log(board)
-			var bomb_coordinates = get_bomb_coordinates()		
-			//console.log(num_bombs)
-			//console.log(bomb_coordinates)
-			var l = bomb_coordinates.length; 
-			for (i=0; i<l; i++){
-				var current = bomb_coordinates.pop() 
-				console.log("current array="+current)
-				var x = current[0];
-				console.log("x="+x)
-				var y = current[1]
-				console.log("y="+y)
-				var index = board[x]
-				//console.log(index)
-				//console.log(index[y])
-				var d = index[y]
-				//console.log(d)
-				d["category"] = "bomb"
-				//console.log(d)
-			}
-			return board
-		} 
 
-		var gen_numbers = function(){
-			var board = add_bombs() 
+		//refactor these two into single function
+		// var add_bombs= function(){
+		// 	var board = init_board(n);
+		// 	//console.log(board)
+		// 	var bomb_coordinates = get_bomb_coordinates()		
+		// 	//console.log(num_bombs)
+		// 	//console.log(bomb_coordinates)
+		// 	var l = bomb_coordinates.length; 
+		// 	for (i=0; i<l; i++){
+		// 		var current = bomb_coordinates.pop()  
+		// 		var x = current[0]; 
+		// 		var y = current[1]; 
+		// 		var index = board[x] 
+		// 		var d = index[y] 
+		// 		d["category"] = "bomb" 
+		// 	}
+		// 	return board
+		// } 
+
+		var gen_board_array = function(){
+			var board = init_board(n)
 			var bomb_coordinates = get_bomb_coordinates() 
-			var l = bomb_coordinates.length 
+			var l = bomb_coordinates.length 			
 			for (i=0; i<l; i++){
-				var current = bomb_coordinates.pop()
-				var x = current[0]	
-				var y = current[1]
-				console.log("x="+ x)
-				console.log("y="+y)
+				var current = bomb_coordinates.pop()  
+				var x = current[0]; 
+				var y = current[1];  
+				board[x][y]["category"] = "bomb" 
 					if(x > 0 && y<n){
 						board[x-1][y+1]["number"]++
+						console.log(board[x-1][y+1])
 					}
 					if (x>0 && y>0){
 						board[x-1][y-1]["number"]++
+						console.log(board[x-1][y-1])
 					}
 					if (y>0 && x<n){
 						board[x+1][y-1]["number"]++
+						console.log(board[x+1][y-1])
 					}
 					if (x<n && y<n){
 						board[x+1][y+1]["number"]++
+						console.log(board[x+1][y+1])
 					}
 					if (x<n){
 						board[x+1][y]["number"]++
+						console.log(board[x+1][y])
 					}
 					if (y<n){
 						board[x][y+1]["number"]++
+						console.log(board[x][y+1])
 					}
 					if (y>0){
 						board[x][y-1]["number"]++
+						console.log(board[x][y-1])
 					}
 					if (x>0){
-						board[x-1][y]["number"]++	
+						board[x-1][y]["number"]++
+						console.log(board[x-1][y])	
 					} 
 				}
 			return board
 		}
-			for (i=0; i<n; i++){
-				$(".grid").append("<tr class='gridrow'></tr>")
-			} 
-			for (i=0;i<n;i++){
-				$(".gridrow").append("<td id='unclicked'></td>")
-			}
-			// var columnCount = $('#grid tr').length;
+		console.log(gen_board_array())
 
-			// var rowCount = $().length
+		var array_of_boards = []
+  		if(array_of_boards.length<1){
+  			array_of_boards.push(gen_board_array())
+  			console.log("pushed array")
+  		}
+		var board = array_of_boards[0]
+  		console.log(array_of_boards[0]) 
+  		for (i=0; i<board.length; i++){
+  			for (j=0; j<board[i].length; j++){
+			console.log(board[i][j])
+			console.log("i="+i+"j="+j)
+			}
+		}
 		// event listener to get coordinates
   		$( "*", document.body ).click(function( event ) {
-		  var offset = $( this ).position();
-		  event.stopPropagation();
-		  $( "#result" ).text( this.tagName +
+		var offset = $( this ).position();
+		event.stopPropagation();
+		$( "#result" ).text( this.tagName +
 		    " coords ( " + offset.left + ", " + offset.top + " )" );
-		  var x = offset.left;
-		  
-		  if (x===10){
-		  	board_x = 0
-		  }
-		  if (x>10){
-		  	board_x = (x-10)/54
-		  }
-		  var y = offset.top
-		  if(y===52){
-		  	var board_y =0
-		  }
-		  else{
-		  	var board_y = (y-52)/54
-		  }
-		  return [board_x, board_y]
-		  console.log(x+","+y)
-		  console.log(board_x+","+board_y)
-		});
-		
-  		// map coordinates to board arrays
+		var x = offset.left;
+			  if (x===10){
+			  	board_x = 0
+			  }
+			  if (x>10){
+			  	board_x = (x-10)/54
+			  }
+			  var y = offset.top
+			  if(y===52){
+			  	var board_y =0
+			  }
+			  else{
+			  	var board_y = (y-52)/54
+			  } 
 
-	});
-//on click update 
-// viewport 
-// on click could get x y coordinates of where mouseclick was 
-// function to figure out which box it belonged in - math.floor
-// x coordinate 95, 95 - top box 
-// round coordinates to nearest ten 
-// 
- 
+		  if(board[board_x][board_y]["category"]=="bomb"){
+		  	$(this).text("X");
+		  }
+		  if(board[board_x][board_y]["category"]=="empty" && board[board_x][board_y]["number"]==0){
+		  	$(this).text("empty");
+		  }
+		  if(board[board_x][board_y]["number"]>0){
+		  	$(this).text(board[board_x][board_y]["number"]);
+		  }
+		  
+		});
+  		// map coordinates to board arrays
+  		//show text if board
+  		 
+
+
+	}); 
 	</script>
 	<body>
 	<p id="result">Click a square</p>

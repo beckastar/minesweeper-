@@ -4,19 +4,23 @@
 	<head>
 		<meta charset="utf-8" />
 	</head>
-	<style>
-	.grid{
-
+	<style> 
+	.square{
+		width: 50px;
+		height: 50px;
 	}
-	#unclicked {
+	.unclicked{
 	width: 50px;
 	height: 50px;
 	background: gray;
 	}
-	#clicked{
-	width: 100px;
-	height: 100px;
+	.clicked{
+	width: 50px;
+	height: 50px;
 	background: white;
+	}
+	.highlight {
+		background-color:red;
 	}
 	</style>
 	<script src="jquery/jquery-1.11.1.min.js"></script> 
@@ -31,11 +35,26 @@
 
 		var n = 8
 		//create grid 
+		var id_index=[]
 		for (i=0; i<n; i++){
-			$(".grid").append("<tr class='gridrow'></tr>")
+			for (j=0; j<n; j++){
+				id_index.push([i,j])
+			}
+		}
+		console.log(id_index)
+		for (i=0; i<n; i++){
+			// var y_id = (parseInt(i))
+			// y_array.push(y_id)
+			 
+			$(".grid").append("<tr class='gridrow' " + '\"'+i+'\"'+"></tr>")
 		} 
+
 		for (i=0;i<n;i++){
-				$(".gridrow").append("<td id='unclicked'></td>")
+				//var x_id = "x:"+(parseInt(i))
+				//link id to variable
+				var square_coords = id_index.shift()
+
+				$(".gridrow").append("<td class='unclicked' 'column' " + '\"'+i+'\"'+"></td>")
 		} 
 		var gen_rows = function(x){ 
 			var row = []
@@ -44,6 +63,8 @@
 				o.is_visible = "false";
 				o.category = "empty"; 
 				o.number = 0;
+				o.x_coord=i;
+				o.y_coord=0;
 				row.push(o)
 			} 
 			return row
@@ -52,9 +73,10 @@
 		//works 
 		var init_board = function(x){
 			var container = [];
-			// var row = gen_rows()
+			var row = gen_rows()
 			for (var i=0; i<x; i++){
-				container.push(gen_rows(n))  
+				var row = gen_rows(n)
+				container.push(row)  
 			}
 			return container
 				} 
@@ -74,74 +96,119 @@
 			var num_bombs = 3
 			for(var i=0; i<num_bombs; i++){
 				bomb_coordinates.push(gen_bomb_coordinates())
+				console.log(bomb_coordinates[i])
 			}  
 			return bomb_coordinates
 		}
 
-		//refactor these two into single function
-		// var add_bombs= function(){
-		// 	var board = init_board(n);
-		// 	//console.log(board)
-		// 	var bomb_coordinates = get_bomb_coordinates()		
-		// 	//console.log(num_bombs)
-		// 	//console.log(bomb_coordinates)
-		// 	var l = bomb_coordinates.length; 
-		// 	for (i=0; i<l; i++){
-		// 		var current = bomb_coordinates.pop()  
-		// 		var x = current[0]; 
-		// 		var y = current[1]; 
-		// 		var index = board[x] 
-		// 		var d = index[y] 
-		// 		d["category"] = "bomb" 
-		// 	}
-		// 	return board
-		// } 
 
 		var gen_board_array = function(){
 			var board = init_board(n)
+			console.log(board)
 			var bomb_coordinates = get_bomb_coordinates() 
+			console.log(bomb_coordinates)
 			var l = bomb_coordinates.length 			
 			for (i=0; i<l; i++){
-				var current = bomb_coordinates.pop()  
-				var x = current[0]; 
+				var current = bomb_coordinates.pop() 
+				console.log(current) 
+				var x = current[0];  
 				var y = current[1];  
 				board[x][y]["category"] = "bomb" 
-					if(x > 0 && y<n){
+				console.log(board[x][y], "bomb?")
+					if(x > 0 && y<n && board[x-1][y+1]["category"]!="bomb"){
 						board[x-1][y+1]["number"]++
+						board[x-1][y+1]["category"]="number"
 						console.log(board[x-1][y+1])
 					}
-					if (x>0 && y>0){
+					if (x>0 && y>0 && board[x-1][y-1]["category"]!="bomb"){
 						board[x-1][y-1]["number"]++
+						board[x-1][y-1]["category"]="number"
 						console.log(board[x-1][y-1])
 					}
-					if (y>0 && x<n){
+					if (y>0 && x<n && board[x+1][y-1]["category"]!="bomb"){
 						board[x+1][y-1]["number"]++
+						board[x+1][y-1]["category"]="number"
 						console.log(board[x+1][y-1])
 					}
-					if (x<n && y<n){
+					if (x<n && y<n && board[x+1][y+1]["category"]!="bomb"){
 						board[x+1][y+1]["number"]++
+						board[x+1][y+1]["category"]="number"
 						console.log(board[x+1][y+1])
 					}
-					if (x<n){
+					if (x<n && board[x+1][y]["category"]!="bomb"){
 						board[x+1][y]["number"]++
+						board[x+1][y]["category"]="number"
 						console.log(board[x+1][y])
 					}
-					if (y<n){
+					if (y<n && board[x][y+1]["category"]!="bomb"){
 						board[x][y+1]["number"]++
+						board[x][y+1]["category"]="number"
 						console.log(board[x][y+1])
 					}
-					if (y>0){
+					if (y>0 && board[x][y-1]["category"]!="bomb"){
 						board[x][y-1]["number"]++
+						board[x][y-1]["category"]="number"
 						console.log(board[x][y-1])
 					}
-					if (x>0){
+					if (x>0 && board[x-1][y]["category"]!="bomb"){
 						board[x-1][y]["number"]++
+						board[x-1][y]["category"]="number"
 						console.log(board[x-1][y])	
 					} 
 				}
 			return board
 		}
-		console.log(gen_board_array())
+		var get_neighbors = function(x, y) {
+			console.log(x+","+y)
+			var surrounding_squares = []
+					if(x > 0 && y<n){
+						console.log((x-1),(y+1))
+						surrounding_squares.push([(x-1),(y+1)])
+						console.log(surrounding_squares)
+					}
+					if (x>0 && y>0){ 
+						surrounding_squares.push([(x-1),(y+1)])
+						console.log(surrounding_squares)
+					}
+					if (y>0 && x<n){ 
+						surrounding_squares.push([(x+1),(y-1)])
+						console.log(surrounding_squares)
+					}
+					if (x<n && y<n){ 
+						surrounding_squares.push([(x+1),(y+1)])
+						console.log(surrounding_squares)
+					}
+					if (x<n){ 
+						surrounding_squares.push([(x-1),(y)])
+						console.log(surrounding_squares)
+					}
+					if (y<n){ 
+						surrounding_squares.push([x,(y+1)])
+						console.log(surrounding_squares)
+					}
+					if (y>0){ 
+						surrounding_squares.push([x,(y+1)])
+						console.log(surrounding_squares)
+					}
+					if (x>0){ 	
+						surrounding_squares.push([(x-1),y])
+						console.log(surrounding_squares)
+					}  
+					console.log(surrounding_squares)
+					return surrounding_squares
+			}
+		// 
+		var not_bombs = function(x,y){
+			var neighbors = get_neighbors(x,y)
+			for (i=0; i<neighbors.length; i++){
+				if(board[i[0]][i[1]].category!="bomb"){
+					board[i[0]][i[1]].is_visible=true 
+				}
+				if(board[i[0]][i[1]].category=="empty"){
+					get_neighbors(i[0],i[1])
+				}
+			}
+		}
 
 		var array_of_boards = []
   		if(array_of_boards.length<1){
@@ -149,19 +216,14 @@
   			console.log("pushed array")
   		}
 		var board = array_of_boards[0]
-  		console.log(array_of_boards[0]) 
-  		for (i=0; i<board.length; i++){
-  			for (j=0; j<board[i].length; j++){
-			console.log(board[i][j])
-			console.log("i="+i+"j="+j)
-			}
-		}
+
 		// event listener to get coordinates
   		$( "*", document.body ).click(function( event ) {
-		var offset = $( this ).position();
 		event.stopPropagation();
+		var offset = $( this ).position(); 
 		$( "#result" ).text( this.tagName +
-		    " coords ( " + offset.left + ", " + offset.top + " )" );
+		    " coords ( " + offset.left + ", " + offset.top + " )" ); 
+
 		var x = offset.left;
 			  if (x===10){
 			  	board_x = 0
@@ -169,22 +231,40 @@
 			  if (x>10){
 			  	board_x = (x-10)/54
 			  }
-			  var y = offset.top
+		var y = offset.top
 			  if(y===52){
 			  	var board_y =0
 			  }
 			  else{
 			  	var board_y = (y-52)/54
 			  } 
-
+		
 		  if(board[board_x][board_y]["category"]=="bomb"){
+		  	console.log(board[board_x][board_y])
 		  	$(this).text("X");
+		  	$(this).toggleClass("") 
+		  	console.log($(this).id())
 		  }
-		  if(board[board_x][board_y]["category"]=="empty" && board[board_x][board_y]["number"]==0){
-		  	$(this).text("empty");
+		  if(board[board_x][board_y]["category"]=="empty"){  
+		  	//creates array of neighboring square indexes with category of empty
+		  	var neighbors = get_neighbors(board_x,board_y)
+		  	console.log(neighbors)
+		  	//console log shows array of arrays with indexes. so far so good...
+		  	//array index to offset position 
+		  	//below is where the trouble is
+		  	for(i=0; i<neighbors.length; i++){
+		  		console.log(neighbors[i])
+		  		var grid_x_position = neighbors[i][0];
+		  		console.log(grid_x_position)
+		  		var grid_y_position = neighbors[i][1]; 
+		  		console.log("gridrow"+" "+grid_y_position+" + column "+grid_x_position)
+		  		$("gridrow"+" "+grid_y_position+" + column"+grid_x_position).text("this")
+		  		// row id = grid_y_position .child column id = grid_x_position . text = board[board_x][board_y]["category"]
+		  	}
 		  }
 		  if(board[board_x][board_y]["number"]>0){
 		  	$(this).text(board[board_x][board_y]["number"]);
+		  	$(this).css("color","red");
 		  }
 		  
 		});

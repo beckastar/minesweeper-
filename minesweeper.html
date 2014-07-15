@@ -25,11 +25,6 @@
 	</style>
 	<script src="jquery/jquery-1.11.1.min.js"></script> 
 	<script type="text/javascript">
-
-
-
-
-
 	$(document).ready(function(){  
 
 
@@ -46,7 +41,7 @@
 			// var y_id = (parseInt(i))
 			// y_array.push(y_id)
 			 
-			$(".grid").append("<tr class='gridrow' " + '\"'+i+'\"'+"></tr>")
+			$(".grid").append("<tr class='gridrow' id=row"+i+"></tr>")
 		} 
 
 		for (i=0;i<n;i++){
@@ -54,7 +49,7 @@
 				//link id to variable
 				var square_coords = id_index.shift()
 
-				$(".gridrow").append("<td class='unclicked' 'column' " + '\"'+i+'\"'+"></td>")
+				$(".gridrow").append("<td class='unclicked' id=column"+i+"></td>")
 		} 
 		var gen_rows = function(x){ 
 			var row = []
@@ -68,9 +63,7 @@
 				row.push(o)
 			} 
 			return row
-		} 
-		//create array for board
-		//works 
+		}  
 		var init_board = function(x){
 			var container = [];
 			var row = gen_rows()
@@ -79,8 +72,7 @@
 				container.push(row)  
 			}
 			return container
-				} 
-	//board is created
+				}  
 		var seed_bomb= function(x){
 			var seed_bomb_index = Math.floor(Math.random() * 7)
 			return seed_bomb_index
@@ -88,113 +80,91 @@
 		var gen_bomb_coordinates=function(){ 
 		 		var x = seed_bomb(n);
 		 		var y = seed_bomb(n); 
+		 		if(x != y){
 				return [x, y]
-		}
-		console.log(gen_bomb_coordinates())
+				}
+				else{
+					gen_bomb_coordinates()
+				}
+		} 
 		var get_bomb_coordinates = function(){
 			var bomb_coordinates = [];
 			var num_bombs = 3
 			for(var i=0; i<num_bombs; i++){
-				bomb_coordinates.push(gen_bomb_coordinates())
-				console.log(bomb_coordinates[i])
+				bomb_coordinates.push(gen_bomb_coordinates()) 
 			}  
 			return bomb_coordinates
 		}
-
-
 		var gen_board_array = function(){
-			var board = init_board(n)
-			console.log(board)
-			var bomb_coordinates = get_bomb_coordinates() 
-			console.log(bomb_coordinates)
+			var board = init_board(n) 
+			var bomb_coordinates = get_bomb_coordinates()  
 			var l = bomb_coordinates.length 			
 			for (i=0; i<l; i++){
-				var current = bomb_coordinates.pop() 
-				console.log(current) 
+				var current = bomb_coordinates.pop()  
 				var x = current[0];  
 				var y = current[1];  
 				board[x][y]["category"] = "bomb" 
-				console.log(board[x][y], "bomb?")
 					if(x > 0 && y<n && board[x-1][y+1]["category"]!="bomb"){
 						board[x-1][y+1]["number"]++
 						board[x-1][y+1]["category"]="number"
-						console.log(board[x-1][y+1])
 					}
 					if (x>0 && y>0 && board[x-1][y-1]["category"]!="bomb"){
 						board[x-1][y-1]["number"]++
-						board[x-1][y-1]["category"]="number"
-						console.log(board[x-1][y-1])
+						board[x-1][y-1]["category"]="number" 
 					}
 					if (y>0 && x<n && board[x+1][y-1]["category"]!="bomb"){
 						board[x+1][y-1]["number"]++
-						board[x+1][y-1]["category"]="number"
-						console.log(board[x+1][y-1])
+						board[x+1][y-1]["category"]="number" 
 					}
 					if (x<n && y<n && board[x+1][y+1]["category"]!="bomb"){
 						board[x+1][y+1]["number"]++
-						board[x+1][y+1]["category"]="number"
-						console.log(board[x+1][y+1])
+						board[x+1][y+1]["category"]="number" 
 					}
 					if (x<n && board[x+1][y]["category"]!="bomb"){
 						board[x+1][y]["number"]++
-						board[x+1][y]["category"]="number"
-						console.log(board[x+1][y])
+						board[x+1][y]["category"]="number" 
 					}
 					if (y<n && board[x][y+1]["category"]!="bomb"){
 						board[x][y+1]["number"]++
-						board[x][y+1]["category"]="number"
-						console.log(board[x][y+1])
+						board[x][y+1]["category"]="number" 
 					}
 					if (y>0 && board[x][y-1]["category"]!="bomb"){
 						board[x][y-1]["number"]++
-						board[x][y-1]["category"]="number"
-						console.log(board[x][y-1])
+						board[x][y-1]["category"]="number" 
 					}
 					if (x>0 && board[x-1][y]["category"]!="bomb"){
 						board[x-1][y]["number"]++
-						board[x-1][y]["category"]="number"
-						console.log(board[x-1][y])	
+						board[x-1][y]["category"]="number" 
 					} 
 				}
 			return board
 		}
-		var get_neighbors = function(x, y) {
-			console.log(x+","+y)
+		var get_neighbors = function(x, y) { 
 			var surrounding_squares = []
-					if(x > 0 && y<n){
-						console.log((x-1),(y+1))
-						surrounding_squares.push([(x-1),(y+1)])
-						console.log(surrounding_squares)
+					if(x > 0 && y<n){ 
+						surrounding_squares.push([(x-1),(y+1)]) 
 					}
 					if (x>0 && y>0){ 
-						surrounding_squares.push([(x-1),(y+1)])
-						console.log(surrounding_squares)
+						surrounding_squares.push([(x-1),(y+1)]) 
 					}
 					if (y>0 && x<n){ 
-						surrounding_squares.push([(x+1),(y-1)])
-						console.log(surrounding_squares)
+						surrounding_squares.push([(x+1),(y-1)]) 
 					}
 					if (x<n && y<n){ 
-						surrounding_squares.push([(x+1),(y+1)])
-						console.log(surrounding_squares)
+						surrounding_squares.push([(x+1),(y+1)]) 
 					}
 					if (x<n){ 
-						surrounding_squares.push([(x-1),(y)])
-						console.log(surrounding_squares)
+						surrounding_squares.push([(x-1),(y)]) 
 					}
 					if (y<n){ 
-						surrounding_squares.push([x,(y+1)])
-						console.log(surrounding_squares)
+						surrounding_squares.push([x,(y+1)]) 
 					}
 					if (y>0){ 
-						surrounding_squares.push([x,(y+1)])
-						console.log(surrounding_squares)
+						surrounding_squares.push([x,(y+1)]) 
 					}
 					if (x>0){ 	
-						surrounding_squares.push([(x-1),y])
-						console.log(surrounding_squares)
-					}  
-					console.log(surrounding_squares)
+						surrounding_squares.push([(x-1),y]) 
+					}   
 					return surrounding_squares
 			}
 		// 
@@ -209,14 +179,11 @@
 				}
 			}
 		}
-
 		var array_of_boards = []
   		if(array_of_boards.length<1){
-  			array_of_boards.push(gen_board_array())
-  			console.log("pushed array")
+  			array_of_boards.push(gen_board_array()) 
   		}
 		var board = array_of_boards[0]
-
 		// event listener to get coordinates
   		$( "*", document.body ).click(function( event ) {
 		event.stopPropagation();
@@ -241,38 +208,26 @@
 		
 		  if(board[board_x][board_y]["category"]=="bomb"){
 		  	console.log(board[board_x][board_y])
-		  	$(this).text("X");
-		  	$(this).toggleClass("") 
-		  	console.log($(this).id())
+		  	$(this).text("X"); 
 		  }
-		  if(board[board_x][board_y]["category"]=="empty"){  
-		  	//creates array of neighboring square indexes with category of empty
+		  if(board[board_x][board_y]["category"]=="empty"){   
 		  	var neighbors = get_neighbors(board_x,board_y)
 		  	console.log(neighbors)
-		  	//console log shows array of arrays with indexes. so far so good...
-		  	//array index to offset position 
-		  	//below is where the trouble is
 		  	for(i=0; i<neighbors.length; i++){
 		  		console.log(neighbors[i])
 		  		var grid_x_position = neighbors[i][0];
 		  		console.log(grid_x_position)
 		  		var grid_y_position = neighbors[i][1]; 
-		  		console.log("gridrow"+" "+grid_y_position+" + column "+grid_x_position)
-		  		$("gridrow"+" "+grid_y_position+" + column"+grid_x_position).text("this")
-		  		// row id = grid_y_position .child column id = grid_x_position . text = board[board_x][board_y]["category"]
+		  		console.log("gridrow"+" "+grid_y_position+" > column "+grid_x_position)
+		  		$(this).text(board[board_x][board_y]["category"])
+		  		$("#row"+grid_y_position+ "> #column"+grid_x_position).text("boom");
 		  	}
 		  }
 		  if(board[board_x][board_y]["number"]>0){
 		  	$(this).text(board[board_x][board_y]["number"]);
 		  	$(this).css("color","red");
 		  }
-		  
 		});
-  		// map coordinates to board arrays
-  		//show text if board
-  		 
-
-
 	}); 
 	</script>
 	<body>
@@ -280,6 +235,6 @@
 	<div id="board">
                 <table class="grid">
                 </table>
-     </div>
-	
+     </div>	
 	</body>
+</html>

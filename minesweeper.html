@@ -87,8 +87,7 @@ $(document).ready(function(){
 			while (bomb_coordinates.length<=num_bombs){
 				var new_bomb = gen_bomb_coordinates()
     			if (jQuery.inArray(new_bomb, bomb_coordinates) == -1){
-					bomb_coordinates.push(new_bomb) 
-					console.log("boom"+bomb_coordinates)
+					bomb_coordinates.push(new_bomb)  
 				}
 			}  
 				return bomb_coordinates
@@ -102,7 +101,7 @@ $(document).ready(function(){
 				var x = current[0];  
 				var y = current[1];  
 				board[x][y]["category"] = "bomb" 
-					if(x > 0 && y<n && board[x-1][y+1]["category"]!="bomb"){
+					if(x > 0 && y<(n-1) && board[x-1][y+1]["category"]!="bomb"){
 						board[x-1][y+1]["number"]++
 						board[x-1][y+1]["category"]="number"
 					}
@@ -110,7 +109,7 @@ $(document).ready(function(){
 						board[x-1][y-1]["number"]++
 						board[x-1][y-1]["category"]="number" 
 					}
-					if (y>0 && x<n && board[x+1][y-1]["category"]!="bomb"){
+					if (y>0 && x<(n-1) && board[x+1][y-1]["category"]!="bomb"){
 						board[x+1][y-1]["number"]++
 						board[x+1][y-1]["category"]="number" 
 					}
@@ -122,7 +121,7 @@ $(document).ready(function(){
 						board[x+1][y]["number"]++
 						board[x+1][y]["category"]="number" 
 					}
-					if (y<n && board[x][y+1]["category"]!="bomb"){
+					if (y<(n-1) && board[x][y+1]["category"]!="bomb"){
 						board[x][y+1]["number"]++
 						board[x][y+1]["category"]="number" 
 					}
@@ -137,47 +136,58 @@ $(document).ready(function(){
 				}
 			return board
 		}
-		var get_neighbors = function(x, y) { 
-			var surrounding_squares = []
-					if(x > 0 && y<n){ 
-						surrounding_squares.push([(x-1),(y+1)]) 
-					}
-					if (x>0 && y>0){ 
-						surrounding_squares.push([(x-1),(y+1)]) 
-					}
-					if (y>0 && x<n){ 
-						surrounding_squares.push([(x+1),(y-1)]) 
-					}
-					if (x<n && y<n){ 
-						surrounding_squares.push([(x+1),(y+1)]) 
-					}
-					if (x<n){ 
-						surrounding_squares.push([(x-1),(y)]) 
-					}
-					if (y<n){ 
-						surrounding_squares.push([x,(y+1)]) 
+		var get_EMPTY_neighbors = function(x, y) { 
+			console.log("x,y"+ x+","+y)
+			var positions = []
+			var surrounding_empty_squares = []
+				//hit edge cases first 
+					if (x>0){
+						positions.push([(x-1),y])
+						if(y<(n-1)){
+							positions.push([(x-1),(y+1)]) 
+						}
+						if (y>0){ 
+						positions.push([(x-1),(y-1)]) 
+						}
 					}
 					if (y>0){ 
-						surrounding_squares.push([x,(y+1)]) 
+						positions.push([x,(y-1)]) 
+						if (x<(n-1)){ 
+							positions.push([(x+1),(y-1)]) 
+						}
+					}  
+					if (x<(n-1)){
+						positions.push([(x+1),y])
+						if (y<(n-1)){ 
+							positions.push([(x+1),(y+1)]) 
+						}
+					if (y<(n-1)){ 
+						positions.push([x,(y+1)]) 
+						}
 					}
-					if (x>0){ 	
-						surrounding_squares.push([(x-1),y]) 
-					}   
-					return surrounding_squares
+					console.log(board)
+					for(i=0;i<positions.length; i++){
+						console.log(positions[i][0]+" "+[positions[i][1]] )
+						console.log(board[positions[i][0]][positions[i][1]])
+							if(board[positions[i][0]][positions[i][1]]["category"]=="empty"){ 
+								surrounding_empty_squares.push(positions[i])
+							}
+						}
+					return surrounding_empty_squares
 			}
-		// this is not called.
-		var not_bombs = function(x,y){
-			var neighbors = get_neighbors(x,y)
-			console.log("neighbors"+" "+ neighbors)
-			for (i=0; i<neighbors.length; i++){
-				if(board[i[0]][i[1]].category!="bomb"){
-					board[i[0]][i[1]].is_visible=true 
-				}
-				if(board[i[0]][i[1]].category=="empty"){
-					get_neighbors(i[0],i[1])
-				}
-			}
-		}
+		// // this is not called.
+		// var not_bombs = function(x,y){
+		// 	var neighbors = get_neighbors(x,y)
+		// 	console.log("neighbors"+" "+ neighbors)
+		// 	for (i=0; i<neighbors.length; i++){
+		// 		if(board[i[0]][i[1]].category!="bomb"){
+		// 			board[i[0]][i[1]].is_visible=true 
+		// 		}
+		// 		if(board[i[0]][i[1]].category=="empty"){
+		// 			get_neighbors(i[0],i[1])
+		// 		}
+		// 	}
+		// }
 		var array_of_boards = []
   		if(array_of_boards.length<1){
   			array_of_boards.push(gen_board_array()) 
@@ -189,7 +199,6 @@ $(document).ready(function(){
 			var offset = $( this ).position(); 
 			$( "#result" ).text( this.tagName +
 			    " coords ( " + offset.left + ", " + offset.top + " )" ); 
-
 			var x = offset.left;
 				  if (x===10){
 				  	board_x = 0
@@ -208,27 +217,38 @@ $(document).ready(function(){
 			if(board[board_x][board_y]["category"]=="bomb"){ 
 			  $(this).text("X"); 
 			}
-			//not getting squares to the right, 
-			  if(board[board_x][board_y]["category"]=="empty"){   
-			  	var neighbors = get_neighbors(board_x,board_y)
-			  	for(i=0; i<neighbors.length; i++){
-			  		var grid_x_position = neighbors[i][0]; 
-			  		var grid_y_position = neighbors[i][1];  
-			  		console.log(board[grid_x_position][grid_y_position])
-			  		$(this).text(board[grid_x_position][grid_y_position]["category"]+grid_x_position+" "+ grid_y_position)
-			  		if (board[grid_x_position][grid_y_position]["category"]=="empty"){
-			  			$("#row"+grid_x_position+ "> #column"+grid_y_position).text(board[grid_x_position][grid_y_position]["category"]);
-			  		}
-			  		if (board[grid_x_position][grid_y_position]["category"]=="number"){
-			  			$("#row"+grid_y_position+ "> #column"+grid_x_position).text(board[grid_x_position][grid_y_position]["number"]).css("color","red");
-			  		}
-			  	}
-			  }
-
-			  if(board[board_x][board_y]["number"]>0){
+			if(board[board_x][board_y]["category"]=="number"){
 			  	$(this).text(board[board_x][board_y]["number"]);
 			  	$(this).css("color","red");
-			  }
+			}
+			//not getting squares to the right, 
+			if(board[board_x][board_y]["category"]=="empty"){   
+				$(this).text(board[board_x][board_y]["category"])
+			    var neighbors = get_EMPTY_neighbors(board_x,board_y)
+			    for(i=0; i<neighbors.length; i++){
+			    		console.log(neighbors[i])
+			    		var grid_x_position = neighbors[i][1];  
+			  			var grid_y_position = neighbors[i][0];  
+			  			console.log("board"+ board[grid_x_position][grid_y_position]["category"]+" row: " + "#row"+(grid_y_position+1)+" "+ "#column"+(grid_x_position+1) + " ")
+			  			$("#row"+(grid_x_position+1)+ "> #column"+(grid_y_position+1)).text(board[grid_y_position][grid_x_position]["category"]);
+				}
+			}
+			  	//link to not_bombs function, or else remove that function entirely.
+
+			  	//for(i=0; i<neighbors.length; i++){
+			  	// 	var grid_x_position = neighbors[i][0]; 
+			  	// 	var grid_y_position = neighbors[i][1]; 
+			  	// 	console.log("x: "+grid_x_position + "y: "+grid_y_position + "board: " + board[grid_x_position][grid_y_position]["category"])  
+			  	// 	 
+			  	// 	if (board[grid_x_position][grid_y_position]["category"]=="empty"){
+			  	// 		$("#row"+grid_x_position+ "> #column"+grid_y_position).text(board[grid_x_position][grid_y_position]["category"]);
+			  	// 	}
+			  	// 	if (board[grid_x_position][grid_y_position]["category"]=="number"){
+			  	// 		$("#row"+grid_y_position+ "> #column"+grid_x_position).text(board[grid_x_position][grid_y_position]["number"]).css("color","red");
+			  	// 	}
+			  	// }
+
+			  //}
 	});
 }); 
 	</script>

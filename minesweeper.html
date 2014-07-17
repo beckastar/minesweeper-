@@ -161,15 +161,14 @@ $(document).ready(function(){
 						if (y<(n-1)){ 
 							positions.push([(x+1),(y+1)]) 
 						}
-					if (y<(n-1)){ 
+					if ((n-1)>y){ 
 						positions.push([x,(y+1)]) 
 						}
 					}
 					console.log(board)
-					for(i=0;i<positions.length; i++){
-						console.log(positions[i][0]+" "+[positions[i][1]] )
-						console.log(board[positions[i][0]][positions[i][1]])
-							if(board[positions[i][0]][positions[i][1]]["category"]=="empty"){ 
+					for(i=0;i<positions.length; i++){ 
+							if(board[positions[i][0]][positions[i][1]]["category"]=="empty" ||board[positions[i][0]][positions[i][1]]["category"]=="number"){ 	
+								board[positions[i][0]][positions[i][1]]["is_visible"]=true
 								surrounding_empty_squares.push(positions[i])
 							}
 						}
@@ -225,12 +224,15 @@ $(document).ready(function(){
 			if(board[board_x][board_y]["category"]=="empty"){   
 				$(this).text(board[board_x][board_y]["category"])
 			    var neighbors = get_EMPTY_neighbors(board_x,board_y)
-			    for(i=0; i<neighbors.length; i++){
-			    		console.log(neighbors[i])
+			    for(i=0; i<neighbors.length; i++){ 
 			    		var grid_x_position = neighbors[i][1];  
 			  			var grid_y_position = neighbors[i][0];  
-			  			console.log("board"+ board[grid_x_position][grid_y_position]["category"]+" row: " + "#row"+(grid_y_position+1)+" "+ "#column"+(grid_x_position+1) + " ")
+			  		if (board[grid_y_position][grid_x_position]["category"]=="empty"){
 			  			$("#row"+(grid_x_position+1)+ "> #column"+(grid_y_position+1)).text(board[grid_y_position][grid_x_position]["category"]);
+			  		}
+			  		if (board[grid_y_position][grid_x_position]["category"]=="number"){
+			  			$("#row"+(grid_x_position+1)+ "> #column"+(grid_y_position+1)).text(board[grid_y_position][grid_x_position]["number"]).css("color","red");
+					}
 				}
 			}
 			  	//link to not_bombs function, or else remove that function entirely.

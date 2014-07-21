@@ -12,33 +12,65 @@
 	.unclicked{
 	width: 50px;
 	height: 50px;
-	background: gray;
+	background: #A3CCD1;
 	}
-	.clicked{
+	.number{
 	width: 50px;
 	height: 50px;
-	background: white;
+	background: #DEB6B1;
+	}
+	.empty{
+		width: 50px;
+		height: 50px;
+		background: #DEB6B1
 	}
 	.highlight {
 		background-color:red;
 	}
+	.bevel {
+    background: url('img.png') top left repeat-x;
+    margin: -1px;
+    border-top: 1px solid #fbfbfb;
+    border-left: 1px solid #fbfbfb;
+    border-right: 1px solid #bfbfbf;
+    border-bottom: 1px solid #e8e8e8;
+	}
+	td, th {
+  		border: solid 1px black;
+	}
+	.side {
+    width: 30px;
+	}
+	table {
+    border-collapse: collapse;
+    border-spacing: 0;
+	}
+	.grad{
+		width: 50px;
+		height: 50px;
+background: rgb(203, 206, 208);
+background: -moz-linear-gradient(1deg, rgb(203, 206, 208) 23%, rgb(95, 95, 95) 79%);
+background: -webkit-linear-gradient(1deg, rgb(203, 206, 208) 23%, rgb(95, 95, 95) 79%);
+background: -o-linear-gradient(1deg, rgb(203, 206, 208) 23%, rgb(95, 95, 95) 79%);
+background: -ms-linear-gradient(1deg, rgb(203, 206, 208) 23%, rgb(95, 95, 95) 79%);
+background: linear-gradient(91deg, rgb(203, 206, 208) 23%, rgb(95, 95, 95) 79%);
+}
+
 	</style>
 	<script src="jquery/jquery-1.11.1.min.js"></script> 
 	<script type="text/javascript">
 $(document).ready(function(){  
-		var n = 8
+		var n = 8;
 		//create grid 
 		var id_index=[]
-		for (i=0; i<n; i++){
+		for (var i=0; i<n; i++){
 			for (j=0; j<n; j++){
 				id_index.push([i,j])
 			}
-		}
-		console.log(id_index)
-		for (i=0; i<n; i++){
+		} 
+		for (var i=0; i<n; i++){
 			// var y_id = (parseInt(i))
 			// y_array.push(y_id)
-			 
 			$(".grid").append("<tr class='gridrow' id=row"+(i+1)+"></tr>")
 		} 
 
@@ -46,9 +78,9 @@ $(document).ready(function(){
 				//var x_id = "x:"+(parseInt(i))
 				//link id to variable
 				var square_coords = id_index.shift()
-
-				$(".gridrow").append("<td class='unclicked' id=column"+(i+1)+"></td>")
+				$(".gridrow").append("<td class='square' id=column"+(i+1)+"></td>")
 		} 
+
 		var gen_rows = function(x){ 
 			var row = []
 			for (i=0; i<x; i++){
@@ -58,6 +90,7 @@ $(document).ready(function(){
 				o.number = 0;
 				o.x_coord=i;
 				o.y_coord=0;
+
 				row.push(o)
 			} 
 			return row
@@ -101,44 +134,58 @@ $(document).ready(function(){
 				var x = current[0];  
 				var y = current[1];  
 				board[x][y]["category"] = "bomb" 
-					if(x > 0 && y<(n-1) && board[x-1][y+1]["category"]!="bomb"){
-						board[x-1][y+1]["number"]++
-						board[x-1][y+1]["category"]="number"
+					if (x>0){
+						if (board[x-1][y]["category"]!="bomb"){
+							board[x-1][y]["category"]="number"
+							board[x-1][y]["number"]++
+						}
+						if(y>(n-1) && board[x-1][y+1]["category"]!="bomb"){
+							board[x-1][y+1]["number"]++
+							board[x-1][y+1]["category"]="number"
+						}
+						if (y>0 && board[x-1][y-1]["category"]!="bomb"){  
+							board[x-1][y-1]["number"]++
+							board[x-1][y-1]["category"]="number"
+						}
 					}
-					if (x>0 && y>0 && board[x-1][y-1]["category"]!="bomb"){
-						board[x-1][y-1]["number"]++
-						board[x-1][y-1]["category"]="number" 
-					}
-					if (y>0 && x<(n-1) && board[x+1][y-1]["category"]!="bomb"){
-						board[x+1][y-1]["number"]++
-						board[x+1][y-1]["category"]="number" 
-					}
-					if (x<n && y<n && board[x+1][y+1]["category"]!="bomb"){
-						board[x+1][y+1]["number"]++
-						board[x+1][y+1]["category"]="number" 
-					}
-					if (x<n && board[x+1][y]["category"]!="bomb"){
+					if (y>0){  
+						if (board[x][y-1]["category"]!="bomb"){
+							board[x][y-1]["category"]="number"
+							board[x][y-1]["number"]++
+						} 
+						if (x<(n-1) && board[x+1][y-1]["category"]!="bomb"){  
+							 board[x+1][y-1]["category"]="number"
+							 board[x+1][y-1]["number"]++
+						}
+					}  
+					if (x<(n-1) && board[x+1][y]["category"]!="bomb"){ 
+						board[x+1][y]["category"]="number"
 						board[x+1][y]["number"]++
-						board[x+1][y]["category"]="number" 
+						if (y<(n-1) && board[x+1][y+1]["category"]!="bomb"){
+							board[x+1][y+1]["category"]="number"
+							board[x+1][y+1]["number"]++   
+						}
+					if ((n-1)>y && board[x][y+1]["category"]!="bomb"){  
+							board[x][y+1]["category"]="number"
+							board[x][y+1]["number"]++
+						}
 					}
-					if (y<(n-1) && board[x][y+1]["category"]!="bomb"){
-						board[x][y+1]["number"]++
-						board[x][y+1]["category"]="number" 
-					}
-					if (y>0 && board[x][y-1]["category"]!="bomb"){
-						board[x][y-1]["number"]++
-						board[x][y-1]["category"]="number" 
-					}
-					if (x>0 && board[x-1][y]["category"]!="bomb"){
-						board[x-1][y]["number"]++
-						board[x-1][y]["category"]="number" 
-					} 
+					if(x > 0 && y<(n-1) && board[x-1][y+1]["category"]!="bomb"){
+						board[x-1][y+1]["category"]="number"
+					 	board[x-1][y+1]["number"]++
+					 }
 				}
 			return board
 		}
-		var get_EMPTY_neighbors = function(x, y) { 
+		var get_surrounding_squares = function(x,y){
+			var surrounding = [[(x-1),y], [(x+1),y],[(x-1),(y+1)],[(x+1),(y+1)],[(x+1),(y-1)],[x,(y+1)],[x,(y-1)],[(x-1),(y-1)]]
+			return surrounding
+		}
+		var get_neighbors = function(x, y) { 
 			console.log("x,y"+ x+","+y)
+			//change name to surrounding_square_positions
 			var positions = []
+			//change position name
 			var surrounding_empty_squares = []
 				//hit edge cases first 
 					if (x>0){
@@ -161,32 +208,49 @@ $(document).ready(function(){
 						if (y<(n-1)){ 
 							positions.push([(x+1),(y+1)]) 
 						}
-					if ((n-1)>y){ 
-						positions.push([x,(y+1)]) 
+						if ((n-1)>y){ 
+							positions.push([x,(y+1)]) 
 						}
 					}
 					console.log(board)
 					for(i=0;i<positions.length; i++){ 
-							if(board[positions[i][0]][positions[i][1]]["category"]=="empty" ||board[positions[i][0]][positions[i][1]]["category"]=="number"){ 	
+							if(board[positions[i][0]][positions[i][1]]["category"]=="empty"){
+								board[positions[i][0]][positions[i][1]]["is_visible"]=true
+								surrounding_empty_squares.push(positions[i]) 	
+							}
+							if (board[positions[i][0]][positions[i][1]]["category"]=="number"){
 								board[positions[i][0]][positions[i][1]]["is_visible"]=true
 								surrounding_empty_squares.push(positions[i])
 							}
+
 						}
 					return surrounding_empty_squares
 			}
-		// // this is not called.
-		// var not_bombs = function(x,y){
-		// 	var neighbors = get_neighbors(x,y)
-		// 	console.log("neighbors"+" "+ neighbors)
-		// 	for (i=0; i<neighbors.length; i++){
-		// 		if(board[i[0]][i[1]].category!="bomb"){
-		// 			board[i[0]][i[1]].is_visible=true 
-		// 		}
-		// 		if(board[i[0]][i[1]].category=="empty"){
-		// 			get_neighbors(i[0],i[1])
-		// 		}
-		// 	}
-		// }
+			var cascade_reveal = function(x,y,neighbors){
+				var extend_clicked_block = []
+				for(var i=0; i<neighbors.length; i++){
+					var current_x = neighbors[i][0]
+					var current_y = neighbors[i][1]
+					if (current_x >0){
+						if (neighbors[(current_x-1), current_y]["is_visible"]==false){
+							extend_clicked_block.push([(current_x-1), current_y])
+							}
+						if(current_y <(n-1) && neighbors[current_x -1][current_y+1]["is_visible"]==false){
+							extend_clicked_block.push([(current_x -1),(current_y+1)]) 
+							}
+						if (current_y >0 && neighbors[(current_x-1),(current_y-1)]["is_visible"]==false){ 
+							extend_clicked_block.push([(current_x-1),(current_y-1)]) 
+							}  
+						}
+					for (var i=0; i<extend_clicked_block.length; i++){
+						extend_clicked_block[i]["is_visible"]=true
+						}
+					
+					}
+				return extend_clicked_block
+			}
+
+
 		var array_of_boards = []
   		if(array_of_boards.length<1){
   			array_of_boards.push(gen_board_array()) 
@@ -196,66 +260,43 @@ $(document).ready(function(){
   		$( "*", document.body ).click(function( event ) {
 			event.stopPropagation();
 			var offset = $( this ).position(); 
+			var board_x = $(this).parent().children().index($(this));
+  			var board_y = $(this).parent().parent().children().index($(this).parent()); 
+
 			$( "#result" ).text( this.tagName +
-			    " coords ( " + offset.left + ", " + offset.top + " )" ); 
-			var x = offset.left;
-				  if (x===10){
-				  	board_x = 0
-				  }
-				  if (x>10){
-				  	board_x = (x-10)/54
-				  }
-			var y = offset.top
-			if(y===52){
-			  	var board_y =0
-			}
-			else{
-			  	var board_y = (y-52)/54
-			} 
-			
+			    " coords ( " + offset.left + ", " + offset.top + " )" + "Row: "+ board_y + "Col: "+ board_x);
+	    
 			if(board[board_x][board_y]["category"]=="bomb"){ 
 			  $(this).text("X"); 
 			}
 			if(board[board_x][board_y]["category"]=="number"){
 			  	$(this).text(board[board_x][board_y]["number"]);
 			  	$(this).css("color","red");
-			}
-			//not getting squares to the right, 
+			} 
 			if(board[board_x][board_y]["category"]=="empty"){   
 				$(this).text(board[board_x][board_y]["category"])
-			    var neighbors = get_EMPTY_neighbors(board_x,board_y)
+			    var clicked_neighbors = get_neighbors(board_x,board_y)
 			    for(i=0; i<neighbors.length; i++){ 
-			    		var grid_x_position = neighbors[i][1];  
-			  			var grid_y_position = neighbors[i][0];  
+			    		var grid_x_position = clicked_neighbors[i][1];  
+			  			var grid_y_position = clicked_neighbors[i][0];  
 			  		if (board[grid_y_position][grid_x_position]["category"]=="empty"){
-			  			$("#row"+(grid_x_position+1)+ "> #column"+(grid_y_position+1)).text(board[grid_y_position][grid_x_position]["category"]);
+			  			$("#row"+(grid_x_position+1)+ "> #column"+(grid_y_position+1)).text(board[grid_y_position][grid_x_position]["category"]).toggleClass('clicked');
+			  				cascade_reveal(grid_x_position, grid_y_position, clicked_neighbors)
+
 			  		}
 			  		if (board[grid_y_position][grid_x_position]["category"]=="number"){
 			  			$("#row"+(grid_x_position+1)+ "> #column"+(grid_y_position+1)).text(board[grid_y_position][grid_x_position]["number"]).css("color","red");
+			  			//call cascading function cascade_reveal(grid_x_position, grid_y_position)
 					}
 				}
 			}
-			  	//link to not_bombs function, or else remove that function entirely.
-
-			  	//for(i=0; i<neighbors.length; i++){
-			  	// 	var grid_x_position = neighbors[i][0]; 
-			  	// 	var grid_y_position = neighbors[i][1]; 
-			  	// 	console.log("x: "+grid_x_position + "y: "+grid_y_position + "board: " + board[grid_x_position][grid_y_position]["category"])  
-			  	// 	 
-			  	// 	if (board[grid_x_position][grid_y_position]["category"]=="empty"){
-			  	// 		$("#row"+grid_x_position+ "> #column"+grid_y_position).text(board[grid_x_position][grid_y_position]["category"]);
-			  	// 	}
-			  	// 	if (board[grid_x_position][grid_y_position]["category"]=="number"){
-			  	// 		$("#row"+grid_y_position+ "> #column"+grid_x_position).text(board[grid_x_position][grid_y_position]["number"]).css("color","red");
-			  	// 	}
-			  	// }
-
-			  //}
 	});
 }); 
 	</script>
 	<body>
 	<p id="result">Click a square</p>
+	<div id="timer"><button><1/button></div>
+	<div id="reset"><button></button></div>
 	<div id="board">
                 <table class="grid">
                 </table>
